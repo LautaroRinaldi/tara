@@ -1,11 +1,8 @@
-#include <boost/thread.hpp>
-
-#include <ros/ros.h>
-#include <ros/time.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include "uvc_cam/uvc_cam.h"
 #include <sensor_msgs/msg/image.hpp>
-#include <sensor_msgs/image_encodings.h>
+//#include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <camera_info_manager/camera_info_manager.h>
 #include <image_transport/image_transport.hpp>

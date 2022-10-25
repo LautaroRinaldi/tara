@@ -1,4 +1,4 @@
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <nodelet/loader.h>
 
 #include "uvc_camera/stereocamera.h"

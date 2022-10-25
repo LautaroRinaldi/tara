@@ -1,12 +1,20 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.8)
 project(uvc_camera)
+
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(camera_info_manager REQUIRED)
 find_package(image_transport REQUIRED)
-find_package(nodelet REQUIRED)
-find_package(rclpp REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(rmw_implementation REQUIRED)
 
 find_package(Boost REQUIRED COMPONENTS thread system)
 
@@ -41,10 +49,14 @@ FIND_PATH(
 SET(GLIB_INCLUDE_DIRS ${GLIB_INCLUDE_DIR} ${GLIBCONFIG_INCLUDE_DIR})
 
 include_directories(
-	include
-	${catkin_INCLUDE_DIRS}
-	${CMAKE_SOURCE_DIR}/src/xunit
+	${rclcpp_INCLUDE_DIRS}
+	${camera_info_manager_INCLUDE_DIRS}
+	${rmw_implementation_INCLUDE_DIRS}
+	${std_msgs_INCLUDE_DIRS}
+	${sensor_msgs_INCLUDE_DIRS}
 	${GLIB_INCLUDE_DIRS}
+	include
+	${CMAKE_SOURCE_DIR}/src/xunit
 )
 
 add_library(xunit
@@ -61,22 +73,46 @@ target_link_libraries(xunitTara ${udev_LIBRARIES} ${GLIB2_LIBRARIES})
 target_link_libraries(xunit ${udev_LIBRARIES})
 
 add_library(nodelet_uvc_camera src/nodelets.cpp src/camera.cpp src/stereo.cpp src/uvc_cam.cpp)
-target_link_libraries(nodelet_uvc_camera ${Boost_LIBRARIES} ${catkin_LIBRARIES} xunit)
+target_link_libraries(nodelet_uvc_camera
+	${rclcpp_LIBRARIES}
+	${camera_info_manager_LIBRARIES}
+	${rmw_implementation_LIBRARIES}
+	${std_msgs_LIBRARIES}
+	xunit
+)
 
 add_executable(uvc_camera_node src/camera_node.cpp src/camera.cpp src/uvc_cam.cpp)
-target_link_libraries(uvc_camera_node ${Boost_LIBRARIES} ${catkin_LIBRARIES} xunit xunitTara -lv4l2 -ludev -lglib-2.0)
+target_link_libraries(uvc_camera_node
+	${rclcpp_LIBRARIES}
+	${camera_info_manager_LIBRARIES}
+	${rmw_implementation_LIBRARIES}
+	${std_msgs_LIBRARIES}
+	xunit
+	xunitTara
+	-lv4l2 -ludev -lglib-2.0
+)
 
 add_executable(uvc_stereo_node src/stereo_node.cpp src/stereo.cpp src/uvc_cam.cpp)
-target_link_libraries(uvc_stereo_node ${Boost_LIBRARIES} ${catkin_LIBRARIES} xunit xunitTara -lv4l2 -ludev -lglib-2.0)
+target_link_libraries(uvc_stereo_node
+	${rclcpp_LIBRARIES}
+	${camera_info_manager_LIBRARIES}
+	${rmw_implementation_LIBRARIES}
+	${std_msgs_LIBRARIES}
+	xunit
+	xunitTara
+	-lv4l2 -ludev -lglib-2.0
+)
 
 add_executable(tara_node src/tara_node.cpp src/tara_ros.cpp src/uvc_cam.cpp)
-target_link_libraries(tara_node ${Boost_LIBRARIES} ${catkin_LIBRARIES} xunitTara ${GLIB2_LIBRARIES} -lv4l2 -lyaml-cpp -ludev -lglib-2.0)
-
-ament_package()
-ament_export_dependencies(rclcpp nodelet sensor_msgs)
-ament_export_include_directories(include)
-ament_export_libraries(nodelet_uvc_camera)
-#ament_export_dependencies(system_lib)
+target_link_libraries(tara_node
+	${rclcpp_LIBRARIES}
+	${camera_info_manager_LIBRARIES}
+	${rmw_implementation_LIBRARIES}
+	${std_msgs_LIBRARIES}
+	xunitTara
+	${GLIB2_LIBRARIES}
+	-lv4l2 -lyaml-cpp -ludev -lglib-2.0
+)
 
 #############
 ## Install ##
@@ -89,30 +125,30 @@ ament_export_libraries(nodelet_uvc_camera)
 ## in contrast to setup.py, you can choose the destination
 # install(PROGRAMS
 #   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+#   DESTINATION lib/${PROJECT_NAME}
 # )
 
 ## Mark executables and/or libraries for installation
 install(TARGETS nodelet_uvc_camera uvc_camera_node uvc_stereo_node
-	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+	ARCHIVE DESTINATION lib
+	LIBRARY DESTINATION lib
+	RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
 install(TARGETS tara_node
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
 install(FILES
   nodelet_uvc_camera.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  DESTINATION share/${PROJECT_NAME}
 )
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+#   DESTINATION include/${PROJECT_NAME}
 #   FILES_MATCHING PATTERN "*.h"
 #   PATTERN ".svn" EXCLUDE
 # )
@@ -121,8 +157,14 @@ install(FILES
 # install(FILES
 #   # myfile1
 #   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+#   DESTINATION share/${PROJECT_NAME}
 # )
+
+ament_export_dependencies(rclcpp nodelet sensor_msgs)
+ament_export_include_directories(include)
+ament_export_libraries(nodelet_uvc_camera)
+#ament_export_dependencies(system_lib)
+ament_package()
 
 #############
 ## Testing ##

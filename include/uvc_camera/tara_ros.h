@@ -1,7 +1,6 @@
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <image_transport/image_transport.hpp>
 #include "uvc_cam/uvc_cam.h"
-#include <boost/thread.hpp>
 #include <camera_info_manager/camera_info_manager.h>
 #include <builtin_interfaces/msg/time.hpp>
 #include <std_msgs/msg/float64.hpp>
@@ -86,7 +85,7 @@ namespace uvc_camera {
 			ros::Subscriber brightness_sub;
 
 			rclcpp::Time last_time;
-			boost::mutex time_mutex_;
+			std::mutex time_mutex_;
 
 			uvc_cam::Cam *cam;
 			std::thread image_thread;

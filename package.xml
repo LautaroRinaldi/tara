@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>uvc_camera</name>
   <version>0.3.0</version>
@@ -18,11 +19,10 @@
   
   <license>GPLv2</license>
 
-  <url type="website">http://ros.org/wiki/see3cam</url>
-
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
   <depend>camera_info_manager</depend>
   <depend>image_transport</depend>
   <depend>nodelet</depend>

@@ -1,11 +1,8 @@
-#include <boost/thread.hpp>
-
-#include <ros/ros.h>
-#include <ros/time.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include "uvc_cam/uvc_cam.h"
 #include <sensor_msgs/msg/image.hpp>
-#include <sensor_msgs/image_encodings.h>
+//#include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <camera_info_manager/camera_info_manager.h>
 #include <image_transport/image_transport.hpp>
@@ -144,7 +141,7 @@ namespace uvc_camera {
 
 				/* and turn on the streamer */
 				ok = true;
-				image_thread = std::thread(boost::bind(&taraCamera::feedImages, this));
+				image_thread = std::thread(std::bind(&taraCamera::feedImages, this));
 
 				std::string time_topic;
 				pnode.getParam("time_topic", time_topic);
@@ -155,7 +152,7 @@ namespace uvc_camera {
 
 				IMU_pub = node.advertise<sensor_msgs::msg::Imu>("get_IMU", 1, true);
 				IMU_inclination_pub = node.advertise<geometry_msgs::msg::Point>("get_inclination", 1, true);
-				IMU_thread = std::thread(boost::bind(&taraCamera::IMU_enable, this));
+				IMU_thread = std::thread(std::bind(&taraCamera::IMU_enable, this));
 			}
 		}
 	
