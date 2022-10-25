@@ -4,11 +4,11 @@
 #include <ros/time.h>
 
 #include "uvc_cam/uvc_cam.h"
-#include "sensor_msgs/Image.h"
-#include "sensor_msgs/image_encodings.h"
-#include "sensor_msgs/CameraInfo.h"
-#include "camera_info_manager/camera_info_manager.h"
-#include "image_transport/image_transport.h"
+#include <sensor_msgs/msg/image.hpp>
+#include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/msg/camera_info.hpp>
+#include <camera_info_manager/camera_info_manager.h>
+#include <image_transport/image_transport.hpp>
 
 #include "uvc_camera/stereocamera.h"
 
@@ -92,10 +92,10 @@ StereoCamera::StereoCamera(ros::NodeHandle comm_nh, ros::NodeHandle param_nh) :
 
   /* and turn on the streamer */
   ok = true;
-  image_thread = boost::thread(boost::bind(&StereoCamera::feedImages, this));
+  image_thread = std::thread(boost::bind(&StereoCamera::feedImages, this));
 }
 
-void StereoCamera::sendInfo(ros::Time time) {
+void StereoCamera::sendInfo(rclcpp::Time time) {
   CameraInfoPtr info_left(new CameraInfo(left_info_mgr.getCameraInfo()));
   CameraInfoPtr info_right(new CameraInfo(right_info_mgr.getCameraInfo()));
 
@@ -115,7 +115,7 @@ void StereoCamera::feedImages() {
     unsigned char *frame_left = NULL, *frame_right = NULL;
     uint32_t bytes_used_left, bytes_used_right;
 
-    ros::Time capture_time = ros::Time::now();
+    rclcpp::Time capture_time = rclcpp::Time::now();
 
     int left_idx = cam_left->grab(&frame_left, bytes_used_left);
     int right_idx = cam_right->grab(&frame_right, bytes_used_right);

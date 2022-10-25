@@ -1,10 +1,10 @@
 #include <ros/ros.h>
-#include <image_transport/image_transport.h>
+#include <image_transport/image_transport.hpp>
 #include "uvc_cam/uvc_cam.h"
 #include <boost/thread.hpp>
 #include <camera_info_manager/camera_info_manager.h>
-#include "std_msgs/Time.h"
-#include "std_msgs/Float64.h"
+#include <builtin_interfaces/msg/time.hpp>
+#include <std_msgs/msg/float64.hpp>
 #include <libv4l2.h>
 #include "camera_calibration_parsers/parse_yml.h"
 #include <fstream>
@@ -44,11 +44,11 @@ namespace uvc_camera {
 
 			taraCamera(ros::NodeHandle comm_nh, ros::NodeHandle param_nh);
 			void onInit();
-			void sendInfoLeft(sensor_msgs::ImagePtr &image, ros::Time time);
-			void sendInfoRight(sensor_msgs::ImagePtr &image, ros::Time time);
+			void sendInfoLeft(sensor_msgs::msg::ImagePtr &image, rclcpp::Time time);
+			void sendInfoRight(sensor_msgs::msg::ImagePtr &image, rclcpp::Time time);
 			void feedImages();
 			~taraCamera();
-			void timeCb(std_msgs::Time time);
+			void timeCb(builtin_interfaces::msg::Time time);
 			BOOL LoadCameraMatrix();
 			//IMU
 			void getInclination(double w_x, double w_y, double w_z, double a_x, double a_y, double a_z);
@@ -85,12 +85,12 @@ namespace uvc_camera {
 			ros::Subscriber exposure_sub;
 			ros::Subscriber brightness_sub;
 
-			ros::Time last_time;
+			rclcpp::Time last_time;
 			boost::mutex time_mutex_;
 
 			uvc_cam::Cam *cam;
-			boost::thread image_thread;
-			boost::thread IMU_thread;
+			std::thread image_thread;
+			std::thread IMU_thread;
 			volatile float beta;	// 2 * proportional gain (Kp)
 			volatile float q0, q1, q2, q3;	// quaternion of sensor frame relative to auxiliary frame
 
@@ -100,8 +100,8 @@ namespace uvc_camera {
 			double squared(double x);
 			double glIMU_Interval;
 
-			void callBackExposure(std_msgs::Float64 call_exposure_value);
-			void callBackBrightness(std_msgs::Float64 call_brightness_value);
+			void callBackExposure(std_msgs::msg::Float64 call_exposure_value);
+			void callBackBrightness(std_msgs::msg::Float64 call_brightness_value);
 			void SetIMUConfigDefaultEnable();
 			void IMU_enable();    
 			int econ_strcmp (const char * str1, const char *str2);

@@ -4,11 +4,11 @@
 #include <ros/time.h>
 
 #include "uvc_cam/uvc_cam.h"
-#include "sensor_msgs/Image.h"
-#include "sensor_msgs/image_encodings.h"
-#include "sensor_msgs/CameraInfo.h"
-#include "camera_info_manager/camera_info_manager.h"
-#include "image_transport/image_transport.h"
+#include <sensor_msgs/msg/image.hpp>
+#include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/msg/camera_info.hpp>
+#include <camera_info_manager/camera_info_manager.h>
+#include <image_transport/image_transport.hpp>
 
 namespace uvc_camera {
 
@@ -16,7 +16,7 @@ class StereoCamera {
   public:
     StereoCamera(ros::NodeHandle comm_nh, ros::NodeHandle param_nh);
     void onInit();
-    void sendInfo(ros::Time time);
+    void sendInfo(rclcpp::Time time);
     void feedImages();
     ~StereoCamera();
 
@@ -35,7 +35,7 @@ class StereoCamera {
     image_transport::Publisher left_pub, right_pub;
     ros::Publisher left_info_pub, right_info_pub;
 
-    boost::thread image_thread;
+    std::thread image_thread;
 };
 
 };

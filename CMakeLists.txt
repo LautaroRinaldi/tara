@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(uvc_camera)
 
-find_package(catkin REQUIRED COMPONENTS camera_info_manager image_transport nodelet roscpp sensor_msgs)
+find_package(ament_cmake REQUIRED)
+find_package(camera_info_manager REQUIRED)
+find_package(image_transport REQUIRED)
+find_package(nodelet REQUIRED)
+find_package(rclpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 find_package(Boost REQUIRED COMPONENTS thread system)
 
@@ -35,13 +40,6 @@ FIND_PATH(
 
 SET(GLIB_INCLUDE_DIRS ${GLIB_INCLUDE_DIR} ${GLIBCONFIG_INCLUDE_DIR})
 
-catkin_package(
-	INCLUDE_DIRS include
-	LIBRARIES nodelet_uvc_camera
-	CATKIN_DEPENDS roscpp nodelet sensor_msgs
-#  DEPENDS system_lib
-)
-
 include_directories(
 	include
 	${catkin_INCLUDE_DIRS}
@@ -73,6 +71,12 @@ target_link_libraries(uvc_stereo_node ${Boost_LIBRARIES} ${catkin_LIBRARIES} xun
 
 add_executable(tara_node src/tara_node.cpp src/tara_ros.cpp src/uvc_cam.cpp)
 target_link_libraries(tara_node ${Boost_LIBRARIES} ${catkin_LIBRARIES} xunitTara ${GLIB2_LIBRARIES} -lv4l2 -lyaml-cpp -ludev -lglib-2.0)
+
+ament_package()
+ament_export_dependencies(rclcpp nodelet sensor_msgs)
+ament_export_include_directories(include)
+ament_export_libraries(nodelet_uvc_camera)
+#ament_export_dependencies(system_lib)
 
 #############
 ## Install ##

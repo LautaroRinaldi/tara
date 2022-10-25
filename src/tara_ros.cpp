@@ -4,12 +4,12 @@
 #include <ros/time.h>
 
 #include "uvc_cam/uvc_cam.h"
-#include "sensor_msgs/Image.h"
-#include "sensor_msgs/image_encodings.h"
-#include "sensor_msgs/CameraInfo.h"
-#include "camera_info_manager/camera_info_manager.h"
-#include "image_transport/image_transport.h"
-#include "std_msgs/Float64.h"
+#include <sensor_msgs/msg/image.hpp>
+#include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/msg/camera_info.hpp>
+#include <camera_info_manager/camera_info_manager.h>
+#include <image_transport/image_transport.hpp>
+#include <std_msgs/msg/float64.hpp>
 
 #include "uvc_camera/tara_ros.h"
 
@@ -62,8 +62,8 @@ namespace uvc_camera {
 			pub_right = it.advertise("right//image_raw", 1);
 			pub_concat = it.advertise("concat", 1);
 
-			exposure_pub = node.advertise<std_msgs::Float64>("get_exposure", 1, true);
-			brightness_pub = node.advertise<std_msgs::Float64>("get_brightness", 1, true);
+			exposure_pub = node.advertise<std_msgs::msg::Float64>("get_exposure", 1, true);
+			brightness_pub = node.advertise<std_msgs::msg::Float64>("get_brightness", 1, true);
 
 			std::string urlLeft;
 			std::string urlRight;
@@ -118,7 +118,7 @@ namespace uvc_camera {
 				
 				}
 			
-				std_msgs::Float64 exposure_msg;
+				std_msgs::msg::Float64 exposure_msg;
 				exposure_msg.data=(float)exposure_value;
 				if ( GetManualExposureValue_Stereo( &exposure_value) == true )
 				{
@@ -130,7 +130,7 @@ namespace uvc_camera {
 				}
 				exposure_pub.publish( exposure_msg );
 
-				std_msgs::Float64 brightness_msg;
+				std_msgs::msg::Float64 brightness_msg;
 				brightness_msg.data=(float)brightness_value;
 				if ( cam -> get_control ( V4L2_CID_BRIGHTNESS, &brightness_value ) == true)
 				{
@@ -144,7 +144,7 @@ namespace uvc_camera {
 
 				/* and turn on the streamer */
 				ok = true;
-				image_thread = boost::thread(boost::bind(&taraCamera::feedImages, this));
+				image_thread = std::thread(boost::bind(&taraCamera::feedImages, this));
 
 				std::string time_topic;
 				pnode.getParam("time_topic", time_topic);
@@ -153,13 +153,13 @@ namespace uvc_camera {
 				exposure_sub = node.subscribe ("set_exposure", 1, &taraCamera::callBackExposure, this);
 				brightness_sub = node.subscribe ("set_brightness", 1, &taraCamera::callBackBrightness, this);
 
-				IMU_pub = node.advertise<sensor_msgs::Imu>("get_IMU", 1, true);
-				IMU_inclination_pub = node.advertise<geometry_msgs::Point>("get_inclination", 1, true);
-				IMU_thread = boost::thread(boost::bind(&taraCamera::IMU_enable, this));
+				IMU_pub = node.advertise<sensor_msgs::msg::Imu>("get_IMU", 1, true);
+				IMU_inclination_pub = node.advertise<geometry_msgs::msg::Point>("get_inclination", 1, true);
+				IMU_thread = std::thread(boost::bind(&taraCamera::IMU_enable, this));
 			}
 		}
 	
-	void taraCamera::callBackExposure (std_msgs::Float64 call_exposure_msg)
+	void taraCamera::callBackExposure (std_msgs::msg::Float64 call_exposure_msg)
 	{
 		DisableIMU();
 		exposure_value=(float)call_exposure_msg.data;
@@ -191,7 +191,7 @@ namespace uvc_camera {
 		}
 	}
 	
-	void taraCamera::callBackBrightness (std_msgs::Float64 call_brightness_msg)
+	void taraCamera::callBackBrightness (std_msgs::msg::Float64 call_brightness_msg)
 	{
 		DisableIMU();
 		brightness_value=(float)call_brightness_msg.data;
@@ -221,7 +221,7 @@ namespace uvc_camera {
 		}
 	}
 	
-	void taraCamera::sendInfoRight(ImagePtr &image, ros::Time time) {
+	void taraCamera::sendInfoRight(ImagePtr &image, rclcpp::Time time) {
 		CameraInfoPtr info(new CameraInfo(info_mgr_right.getCameraInfo()));
 
 		/* Throw out any CamInfo that's not calibrated to this camera mode */
@@ -242,7 +242,7 @@ namespace uvc_camera {
 
 		info_pub_right.publish(info);
 	}
-	void taraCamera::sendInfoLeft(ImagePtr &image, ros::Time time) {
+	void taraCamera::sendInfoLeft(ImagePtr &image, rclcpp::Time time) {
 		CameraInfoPtr info(new CameraInfo(info_mgr_left.getCameraInfo()));
 
 		/* Throw out any CamInfo that's not calibrated to this camera mode */
@@ -267,7 +267,7 @@ namespace uvc_camera {
 		info_pub_left.publish(info);
 	}
 
-	void taraCamera::timeCb(std_msgs::Time time)
+	void taraCamera::timeCb(builtin_interfaces::msg::Time time)
 	{
 		time_mutex_.lock();
 		last_time = time.data;
@@ -286,7 +286,7 @@ namespace uvc_camera {
 			int idx = cam->grabStereo(&img_frame, bytes_used, &left_frame, &right_frame, &concat_frame);
 
 			time_mutex_.lock();
-			ros::Time capture_time = ros::Time::now();        
+			rclcpp::Time capture_time = rclcpp::Time::now();        
 			time_mutex_.unlock();
 
 
@@ -449,7 +449,7 @@ namespace uvc_camera {
 		std::ofstream foutLeft(cameraLeft_path.c_str());
 		if (!foutLeft) std::cout << "Left camera matrix not found" << std::endl;
 
-		std::ofstream foutRight(cameraRight_path.c_str());
+		std::ofstream foutRight(cameraRight_path.c_str());	
 		if (!foutRight) std::cout << "Right camera matrix not found" << std::endl;
 
 
@@ -673,7 +673,7 @@ namespace uvc_camera {
 		angleY = RwEst[1] * HALF_PI * RAD2DEG;
 		angleZ = RwEst[2] * HALF_PI * RAD2DEG;
 
-		geometry_msgs::Point IMUValue;
+		geometry_msgs::msg::Point IMUValue;
 		IMUValue.x = angleX;
 		IMUValue.y = angleY;
 		IMUValue.z = angleZ;
@@ -911,7 +911,7 @@ namespace uvc_camera {
 		float _2q0, _2q1, _2q2, _2q3, _4q0, _4q1, _4q2 ,_8q1, _8q2, q0q0, q1q1, q2q2, q3q3;
 		
 		
-		sensor_msgs::Imu IMUValue;
+		sensor_msgs::msg::Imu IMUValue;
 		
 		// To convert acceleration from 'mg' to 'm/s2'
 		IMUValue.linear_acceleration.x = ax * 9.80665 / 1000;
