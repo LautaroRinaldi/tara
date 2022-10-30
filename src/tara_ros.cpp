@@ -23,14 +23,14 @@ namespace uvc_camera {
 		info_mgr_right(_comm_nh.get(), "cameraRight"), cam(0) {
 
 			/* parameters declaration */
-			node->declare_parameter("width", "int");
-			node->declare_parameter("height", "int");
-			node->declare_parameter("fps", "int");
-			node->declare_parameter("frame", "string");
-			node->declare_parameter("device", "string");
-			node->declare_parameter("exposureValue", "int");
-			node->declare_parameter("cameraLeft_info_url", "string");
-			node->declare_parameter("cameraRight_info_url", "string");
+			node->declare_parameter("width", rclcpp::ParameterType::PARAMETER_INTEGER);
+			node->declare_parameter("height", rclcpp::ParameterType::PARAMETER_INTEGER);
+			node->declare_parameter("fps", rclcpp::ParameterType::PARAMETER_INTEGER);
+			node->declare_parameter("frame", rclcpp::ParameterType::PARAMETER_STRING);
+			node->declare_parameter("device", rclcpp::ParameterType::PARAMETER_STRING);
+			node->declare_parameter("exposureValue", rclcpp::ParameterType::PARAMETER_INTEGER);
+			node->declare_parameter("cameraLeft_info_url", rclcpp::ParameterType::PARAMETER_STRING);
+			node->declare_parameter("cameraRight_info_url", rclcpp::ParameterType::PARAMETER_STRING);
 
 			/* default config values */
 			width = 640;
@@ -66,7 +66,7 @@ namespace uvc_camera {
 
 			/* advertise image streams and info streams */
 			pub = it.advertise("image_raw", 1);
-			pub_left = it.advertise("left//image_raw", 1);
+			pub_left = it.advertise("left//image_raw", 1); //ATENCION: en la versión original el / era //. Pero daba error eso ahora.
 			pub_right = it.advertise("right//image_raw", 1);
 			pub_concat = it.advertise("concat", 1);
 

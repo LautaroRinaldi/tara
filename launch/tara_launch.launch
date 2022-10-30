@@ -1,6 +1,6 @@
 <!--XML-->
     <launch>
-     <node namespace="stereo" pkg="uvc_camera" exec="tara_node" name="uvc_camera" output="screen" required="true">
+     <node namespace="stereo" pkg="uvc_camera" exec="tara_node" name="uvc_camera" output="screen">
       <param name="width" value="640" />
       <param name="height" value="480" />
       <param name="fps" value="30" />

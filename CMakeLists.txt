@@ -112,11 +112,14 @@ target_link_libraries(uvc_stereo_node
 
 add_executable(tara_node src/tara_node.cpp src/tara_ros.cpp src/uvc_cam.cpp)
 target_link_libraries(tara_node
-	${rclcpp_LIBRARIES}
-	${camera_info_manager_LIBRARIES}
-	${image_transport_LIBRARIES}
-	${rmw_implementation_LIBRARIES}
-	${std_msgs_LIBRARIES}
+	rclcpp::rclcpp
+	camera_info_manager::camera_info_manager
+	image_transport::image_transport
+	#${rmw_implementation_LIBRARIES}
+	#rmw_implementation::rmw_implementation
+	${rmw_implementation_TARGETS}
+	#${std_msgs_LIBRARIES}
+	${std_msgs_TARGETS}
 	xunitTara
 	${GLIB2_LIBRARIES}
 	-lv4l2 -lyaml-cpp -ludev -lglib-2.0
