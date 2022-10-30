@@ -1,16 +1,16 @@
 #include <rclcpp/rclcpp.hpp>
 #include <image_transport/image_transport.hpp>
 #include "uvc_cam/uvc_cam.h"
-#include <camera_info_manager/camera_info_manager.h>
+#include <camera_info_manager/camera_info_manager.hpp>
 #include <builtin_interfaces/msg/time.hpp>
 #include <std_msgs/msg/float64.hpp>
 #include <libv4l2.h>
-#include "camera_calibration_parsers/parse_yml.h"
+#include <camera_calibration_parsers/parse_yml.hpp>
 #include <fstream>
 #include <yaml-cpp/yaml.h>
-#include "geometry_msgs/Point.h"
-#include "std_msgs/Bool.h"
-#include "sensor_msgs/Imu.h"
+#include <geometry_msgs/msg/point.hpp>
+#include <std_msgs/msg/bool.hpp>
+#include <sensor_msgs/msg/imu.hpp>
 
 using namespace std;
 
@@ -41,10 +41,10 @@ namespace uvc_camera {
 			IMUDATAOUTPUT_TypeDef *lIMUOutput;
 			bool isCameraStereo;
 
-			taraCamera(ros::NodeHandle comm_nh, ros::NodeHandle param_nh);
+			taraCamera(rclcpp::Node::SharedPtr comm_nh);
 			void onInit();
-			void sendInfoLeft(sensor_msgs::msg::ImagePtr &image, rclcpp::Time time);
-			void sendInfoRight(sensor_msgs::msg::ImagePtr &image, rclcpp::Time time);
+			void sendInfoLeft(sensor_msgs::msg::Image::SharedPtr &image, rclcpp::Time time);
+			void sendInfoRight(sensor_msgs::msg::Image::SharedPtr &image, rclcpp::Time time);
 			void feedImages();
 			~taraCamera();
 			void timeCb(builtin_interfaces::msg::Time time);
@@ -56,7 +56,7 @@ namespace uvc_camera {
 			int returnValue;
 
 		private:
-			ros::NodeHandle node, pnode;
+			rclcpp::Node::SharedPtr node;
 			image_transport::ImageTransport it;
 			bool ok;
 
@@ -72,18 +72,19 @@ namespace uvc_camera {
 			camera_info_manager::CameraInfoManager info_mgr_right;
 
 			image_transport::Publisher pub, pub_left, pub_right, pub_concat;
-			ros::Publisher info_pub;
-			ros::Publisher info_pub_left;
-			ros::Publisher info_pub_right;    
-			ros::Publisher exposure_pub;
-			ros::Publisher brightness_pub;
-			ros::Publisher IMU_inclination_pub;
-			ros::Publisher IMU_pub;
+			rclcpp::Publisher<camera_info_manager::CameraInfo>::SharedPtr info_pub;
+			rclcpp::Publisher<camera_info_manager::CameraInfo>::SharedPtr info_pub_left;
+			rclcpp::Publisher<camera_info_manager::CameraInfo>::SharedPtr info_pub_right;    
+			rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr exposure_pub;
+			rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr brightness_pub;
+			rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr IMU_inclination_pub;
+			rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr IMU_pub;
 
-			ros::Subscriber time_sub;
-			ros::Subscriber exposure_sub;
-			ros::Subscriber brightness_sub;
+			rclcpp::Subscription<builtin_interfaces::msg::Time>::SharedPtr time_sub;
+			rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr exposure_sub;
+			rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr brightness_sub;
 
+			rclcpp::Clock clock;
 			rclcpp::Time last_time;
 			std::mutex time_mutex_;
 

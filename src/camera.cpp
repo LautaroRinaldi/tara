@@ -2,9 +2,9 @@
 
 #include "uvc_cam/uvc_cam.h"
 #include <sensor_msgs/msg/image.hpp>
-//#include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/image_encodings.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
-#include <camera_info_manager/camera_info_manager.h>
+#include <camera_info_manager/camera_info_manager.hpp>
 #include <image_transport/image_transport.hpp>
 #include <std_msgs/msg/float64.hpp>
 
@@ -14,7 +14,7 @@ using namespace sensor_msgs;
 
 namespace uvc_camera {
 
-Camera::Camera(ros::NodeHandle _comm_nh, ros::NodeHandle _param_nh) :
+Camera::Camera(rclcpp::Node::SharedPtr _comm_nh, rclcpp::Node::SharedPtr _param_nh) :
       node(_comm_nh), pnode(_param_nh), it(_comm_nh),
       info_mgr(_comm_nh, "camera"), cam(0) {
 

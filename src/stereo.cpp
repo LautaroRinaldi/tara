@@ -2,9 +2,9 @@
 
 #include "uvc_cam/uvc_cam.h"
 #include <sensor_msgs/msg/image.hpp>
-//#include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/image_encodings.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
-#include <camera_info_manager/camera_info_manager.h>
+#include <camera_info_manager/camera_info_manager.hpp>
 #include <image_transport/image_transport.hpp>
 
 #include "uvc_camera/stereocamera.h"
@@ -29,10 +29,10 @@ static inline void rotate(unsigned char *dst_chr, unsigned char *src_chr, int pi
 
 namespace uvc_camera {
 
-StereoCamera::StereoCamera(ros::NodeHandle comm_nh, ros::NodeHandle param_nh) :
+StereoCamera::StereoCamera(rclcpp::Node::SharedPtr comm_nh, rclcpp::Node::SharedPtr param_nh) :
   node(comm_nh), pnode(param_nh), it(comm_nh),
-  left_info_mgr(ros::NodeHandle(comm_nh, "left"), "left_camera"),
-  right_info_mgr(ros::NodeHandle(comm_nh, "right"), "right_camera") {
+  left_info_mgr(rclcpp::Node::SharedPtr(comm_nh, "left"), "left_camera"),
+  right_info_mgr(rclcpp::Node::SharedPtr(comm_nh, "right"), "right_camera") {
 
   /* default config values */
   width = 640;

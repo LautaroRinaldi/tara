@@ -1,20 +1,21 @@
 #include <rclcpp/rclcpp.hpp>
-#include <nodelet/loader.h>
 
 #include "uvc_camera/tara_ros.h"
 
 int main (int argc, char **argv)
 {
-	ros::init(argc, argv, "tara_ros");
-	  	
-	uvc_camera::taraCamera camera(ros::NodeHandle(), ros::NodeHandle("~"));
+	rclcpp::init(argc, argv);
+	
+	auto node = rclcpp::Node::make_shared("tara_ros");
+
+	uvc_camera::taraCamera camera(node);
 	if ( camera.isCameraStereo == false )
 	{
-		ros::shutdown();
+		rclcpp::shutdown();
 	}
 	else
 	{  
-		ros::spin();
+		rclcpp::spin(node);
 	}
 	return 0;
 }

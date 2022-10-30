@@ -2,23 +2,23 @@
 
 #include "uvc_cam/uvc_cam.h"
 #include <sensor_msgs/msg/image.hpp>
-//#include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/image_encodings.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
-#include <camera_info_manager/camera_info_manager.h>
+#include <camera_info_manager/camera_info_manager.hpp>
 #include <image_transport/image_transport.hpp>
 
 namespace uvc_camera {
 
 class StereoCamera {
   public:
-    StereoCamera(ros::NodeHandle comm_nh, ros::NodeHandle param_nh);
+    StereoCamera(rclcpp::Node::SharedPtr comm_nh, rclcpp::Node::SharedPtr param_nh);
     void onInit();
     void sendInfo(rclcpp::Time time);
     void feedImages();
     ~StereoCamera();
 
   private:
-    ros::NodeHandle node, pnode;
+    rclcpp::Node::SharedPtr node, pnode;
     image_transport::ImageTransport it;
     bool ok;
 

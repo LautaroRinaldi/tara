@@ -2,7 +2,7 @@
 #include <image_transport/image_transport.hpp>
 #include "uvc_cam/uvc_cam.h"
 #include <mutex>
-#include <camera_info_manager/camera_info_manager.h>
+#include <camera_info_manager/camera_info_manager.hpp>
 #include <builtin_interfaces/msg/time.hpp>
 #include <std_msgs/msg/float64.hpp>
 
@@ -10,9 +10,9 @@ namespace uvc_camera {
 
 class Camera {
   public:
-    Camera(ros::NodeHandle comm_nh, ros::NodeHandle param_nh);
+    Camera(rclcpp::Node::SharedPtr comm_nh, rclcpp::Node::SharedPtr param_nh);
     void onInit();
-    void sendInfo(sensor_msgs::msg::ImagePtr::SharedPtr image, rclcpp::Time time);
+    void sendInfo(sensor_msgs::Image::Ptr::SharedPtr image, rclcpp::Time time);
     void feedImages();  
     ~Camera();
 
@@ -21,7 +21,7 @@ class Camera {
     void callBackBrightness(std_msgs::msg::Float64 call_brightness_value);
 
   private:
-    ros::NodeHandle node, pnode;
+    rclcpp::Node::SharedPtr node, pnode;
     image_transport::ImageTransport it;
     bool ok;
 
@@ -38,9 +38,9 @@ class Camera {
     ros::Publisher exposure_pub;
     ros::Publisher brightness_pub;
 
-    ros::Subscriber time_sub;
-    ros::Subscriber exposure_sub;
-    ros::Subscriber brightness_sub;
+    ros::Subscription time_sub;
+    ros::Subscription exposure_sub;
+    ros::Subscription brightness_sub;
     
     rclcpp::Time last_time;
     std::mutex time_mutex_;
