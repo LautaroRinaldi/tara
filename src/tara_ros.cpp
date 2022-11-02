@@ -66,8 +66,8 @@ namespace uvc_camera {
 
 			/* advertise image streams and info streams */
 			pub = it.advertise("image_raw", 1);
-			pub_left = it.advertise("left//image_raw", 1); //ATENCION: en la versión original el / era //. Pero daba error eso ahora.
-			pub_right = it.advertise("right//image_raw", 1);
+			pub_left = it.advertise("left/image_raw", 1); //ATENCION: en la versión original el / era //. Pero daba error eso ahora.
+			pub_right = it.advertise("right/image_raw", 1);
 			pub_concat = it.advertise("concat", 1);
 
 			exposure_pub = node->create_publisher<std_msgs::msg::Float64>("get_exposure", rclcpp::QoS(1).transient_local());
@@ -97,8 +97,8 @@ namespace uvc_camera {
 				info_mgr_left.loadCameraInfo(urlLeft);
 				info_mgr_right.loadCameraInfo(urlRight);
 
-				info_pub_left = node->create_publisher<camera_info_manager::CameraInfo>("left//camera_info", 1);
-				info_pub_right = node->create_publisher<camera_info_manager::CameraInfo>("right//camera_info", 1);
+				info_pub_left = node->create_publisher<camera_info_manager::CameraInfo>("left/camera_info", 1);
+				info_pub_right = node->create_publisher<camera_info_manager::CameraInfo>("right/camera_info", 1);
 
 				returnValue = cam->set_control(V4L2_CID_BRIGHTNESS , 4); // brightness
 				if ( false == returnValue)
@@ -1006,7 +1006,9 @@ namespace uvc_camera {
 		IMUValue.orientation.x = q1;
 		IMUValue.orientation.y = q2;
 		IMUValue.orientation.z = q3;
-#endif		
+#endif
+		IMUValue.header.stamp = clock.now();
+		/// IMUValue->header.frame_id = IMU;
 		IMU_pub->publish(IMUValue);		
 	}
 
