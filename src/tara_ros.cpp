@@ -66,7 +66,7 @@ namespace uvc_camera {
 
 			/* advertise image streams and info streams */
 			pub = it.advertise("image_raw", 1);
-			pub_left = it.advertise("left/image_raw", 1); //ATENCION: en la versión original el / era //. Pero daba error eso ahora.
+			pub_left = it.advertise("left/image_raw", 1);
 			pub_right = it.advertise("right/image_raw", 1);
 			pub_concat = it.advertise("concat", 1);
 
